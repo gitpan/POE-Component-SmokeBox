@@ -163,7 +163,7 @@ sub _spawn_wheel {
 sub _sig_child {
   my ($kernel,$self,$thing,$pid,$status) = @_[KERNEL,OBJECT,ARG0..ARG2];
   push @{ $self->{_wheel_log} }, "$thing $pid $status";
-  warn "$thing $pid $status\n" if $self->{debug};
+  warn "$thing $pid $status\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   $kernel->delay( '_wheel_idle' );
   $self->{end_time} = time();
   my $job = { };
@@ -171,7 +171,7 @@ sub _sig_child {
   $job->{log} = $self->{_wheel_log};
   $job->{$_} = $self->{extra}->{$_} for keys %{ $self->{extra} };
   $job->{$_} = $self->{$_} for grep { $self->{$_} } qw(command env PID start_time end_time idle_kill excess_kill term_kill perl type);
-  $job->{program} = $self->{program} if $self->{debug};
+  $job->{program} = $self->{program} if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   $job->{module} = $self->{module} if $self->{command} eq 'smoke';
   $kernel->post( $self->{session}, $self->{event}, $job );
   $kernel->refcount_decrement( $self->{session}, __PACKAGE__ );
@@ -194,7 +194,7 @@ sub _wheel_stdout {
   my ($self, $input, $wheel_id) = @_[OBJECT, ARG0, ARG1];
   $self->{_wheel_time} = time();
   push @{ $self->{_wheel_log} }, $input;
-  warn $input, "\n" if $self->{debug};
+  warn $input, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   undef;
 }
 
@@ -202,7 +202,7 @@ sub _wheel_stderr {
   my ($self, $input, $wheel_id) = @_[OBJECT, ARG0, ARG1];
   $self->{_wheel_time} = time();
   push @{ $self->{_wheel_log} }, $input;
-  warn $input, "\n" if $self->{debug};
+  warn $input, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   undef;
 }
 
@@ -226,7 +226,7 @@ sub _wheel_idle {
 sub _wheel_kill {
   my ($kernel,$self,$reason) = @_[KERNEL,OBJECT,ARG0];
   push @{ $self->{_wheel_log} }, $reason;
-  warn $reason, "\n" if $self->{debug};
+  warn $reason, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   if ( $^O eq 'MSWin32' and $self->{wheel} ) {
 #    my $grp_pid = $self->{_current_job}->{GRP_PID};
 #    return unless $grp_pid;
@@ -380,6 +380,11 @@ ARG0 of the C<event> specified in one of the constructors will be a hashref with
   'term_kill', only present if the job was killed due to a poco shutdown event;
 
 Plus any of the parameters given to one of the constructors, including arbitary ones.
+
+=head1 ENVIRONMENT
+
+Setting the environment variable C<PERL5_SMOKEBOX_DEBUG> will cause the component to spew out lots of 
+information on STDERR.
 
 =head1 AUTHOR
 
