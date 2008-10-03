@@ -55,5 +55,6 @@ t/smokebox/02_smokers.t
 t/smokebox/03_multiplicity.t
 t/smokebox/04_smokers_more.t
 t/smokebox/05_multi_smoke.t
+t/smokebox/06_many_jobs.t
 t/zauth/99_pod.t
 t/zauth/99_pod_coverage.t

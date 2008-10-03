@@ -86,6 +86,7 @@ sub _process_queue {
 	my $session = delete $job->{session};
 	$kernel->post( $session, delete $job->{event}, $job );
 	$kernel->refcount_decrement( $session, __PACKAGE__ );
+  	$kernel->yield( '_process_queue' );
 	return;
      }
   }

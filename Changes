@@ -1,6 +1,10 @@
 POE::Component::SmokeBox ChangeLog
 ==================================
 
+0.01_03	Fri Oct  3 13:25:26 BST 2008
+	- Fixed bug in JobQueue, we were only processing
+	  the first job that was submitted. Doh.
+
 0.01_02	Fri Oct  3 12:10:18 BST 2008
 	- Added PERL5_SMOKEBOX_DEBUG env to ::Backend
 
