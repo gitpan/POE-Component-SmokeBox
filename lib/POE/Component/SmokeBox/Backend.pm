@@ -5,6 +5,7 @@ use warnings;
 use Carp;
 use Storable;
 use POE qw(Wheel::Run);
+use Digest::MD5 qw(md5_hex);
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 use vars qw($VERSION);
 
@@ -153,6 +154,8 @@ sub _spawn_wheel {
   delete $ENV{$_} for keys %{ $self->{env} };
   $ENV{$_} = $env_back_up{$_} for keys %env_back_up;
   $self->{_wheel_log} = [ ];
+  $self->{_digests} = { };
+  $self->{_loop_detect} = 0;
   $self->{start_time} = time();
   $self->{PID} = $self->{wheel}->PID();
   $kernel->sig_child( $self->{PID}, '_sig_child' );
@@ -166,6 +169,8 @@ sub _sig_child {
   warn "$thing $pid $status\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   $kernel->delay( '_wheel_idle' );
   $self->{end_time} = time();
+  delete $self->{_digests};
+  delete $self->{_loop_detect};
   my $job = { };
   $job->{status} = $status;
   $job->{log} = $self->{_wheel_log};
@@ -195,6 +200,10 @@ sub _wheel_stdout {
   $self->{_wheel_time} = time();
   push @{ $self->{_wheel_log} }, $input;
   warn $input, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
+  if ( $self->_detect_loop( $input ) ) {
+    $self->{excess_kill} = 1;
+    $poe_kernel->yield( '_wheel_kill', 'Killing current run due to detection of looping output' );
+  }
   undef;
 }
 
@@ -203,7 +212,21 @@ sub _wheel_stderr {
   $self->{_wheel_time} = time();
   push @{ $self->{_wheel_log} }, $input;
   warn $input, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
+  if ( $self->_detect_loop( $input ) ) {
+    $self->{excess_kill} = 1;
+    $poe_kernel->yield( '_wheel_kill', 'Killing current run due to detection of looping output' );
+  }
   undef;
+}
+
+sub _detect_loop {
+  my $self = shift;
+  my $input = shift || return;
+  return if $self->{_loop_detect};
+  my $digest = md5_hex( $input );
+  $self->{_digests}->{ $digest }++;
+  return unless ++$self->{_digests}->{ $digest } > 300;
+  return $self->{_loop_detect} = 1;
 }
 
 sub _wheel_idle {

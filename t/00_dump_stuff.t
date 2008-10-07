@@ -16,6 +16,7 @@ warn version( 'POE', 'required' );
 warn version( 'Module::Pluggable', 'required' );
 warn version( 'Object::Accessor', 'required' );
 warn version( 'Params::Check', 'required' );
+warn version( 'Digest::MD5', 'required' );
 
 warn "\n";
 

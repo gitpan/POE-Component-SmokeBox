@@ -12,6 +12,7 @@ requires 'POE' => 1.0001;
 requires 'Module::Pluggable' => 0;
 requires 'Params::Check' => 0;
 requires 'Object::Accessor' => 0;
+requires 'Digest::MD5' => 0;
 tests 't/*.t t/*/*.t';
 
 print <<NOTICE;

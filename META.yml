@@ -18,6 +18,7 @@ no_index:
     - t
     - examples
 requires:
+  Digest::MD5: 0
   Module::Pluggable: 0
   Object::Accessor: 0
   POE: 1.0001
@@ -25,4 +26,4 @@ requires:
   perl: 5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.01_03
+version: 0.01_04

@@ -1,6 +1,9 @@
 POE::Component::SmokeBox ChangeLog
 ==================================
 
+0.01_04	Tue Oct  7 17:20:13 BST 2008
+	- Added loop detection to ::Backend 
+
 0.01_03	Fri Oct  3 13:25:26 BST 2008
 	- Fixed bug in JobQueue, we were only processing
 	  the first job that was submitted. Doh.
