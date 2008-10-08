@@ -4,26 +4,26 @@ use Config;
 my $ok;
 
 diag("\n\nCode borrowed from XML::Twig by MIROD\n");
-diag "\nConfiguration:\n\n";
+diag("\nConfiguration:\n\n");
 
 # required
-diag "perl: $]\n";
-diag "OS: $Config{'osname'} - $Config{'myarchname'}\n";
+diag("perl: $]\n");
+diag("OS: $Config{'osname'} - $Config{'myarchname'}\n");
+
+diag("\n");
+
+diag( version( 'POE', 'required' ) );
+diag( version( 'Module::Pluggable', 'required' ) );
+diag( version( 'Object::Accessor', 'required' ) );
+diag( version( 'Params::Check', 'required' ) );
+diag( version( 'Digest::MD5', 'required' ) );
 
 diag "\n";
 
-diag version( 'POE', 'required' );
-diag version( 'Module::Pluggable', 'required' );
-diag version( 'Object::Accessor', 'required' );
-diag version( 'Params::Check', 'required' );
-diag version( 'Digest::MD5', 'required' );
+diag( version( 'Test::More', 'required for build' ) );
+diag( version( 'File::Spec', 'required for build' ) );
 
-diag "\n";
-
-diag version( 'Test::More', 'required for build' );
-diag version( 'File::Spec', 'required for build' );
-
-diag "\n";
+diag("\n");
 
 sleep 1;
 
