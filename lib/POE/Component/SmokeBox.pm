@@ -8,7 +8,7 @@ use POE::Component::SmokeBox::Job;
 use POE::Component::SmokeBox::Result;
 use vars qw($VERSION);
 
-$VERSION = '0.01_04';
+$VERSION = '0.01_05';
 
 sub spawn {
   my $package = shift;
@@ -167,7 +167,7 @@ sub _submit {
   warn "No smokers have been defined yet!!!!!\n" unless scalar @{ $self->{queues} };
   
   foreach my $q ( @{ $self->{queues} } ) {
-     $args->{job}->smokers( [ @{ $q->{smokers} } ] );
+     $args->{smokers} = [ @{ $q->{smokers} } ];
      $q->{queue}->submit( $args );
   }
 

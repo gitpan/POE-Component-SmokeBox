@@ -17,13 +17,6 @@ sub new {
 	type    => { defined => 1, default => 'CPANPLUS::YACSmoke', },
 	command => { allow => [ qw(check index smoke) ], default => 'check', },
 	module  => { defined => 1 },
-	smokers => { defined => 1, allow => [
-		sub { 
-			return 1 if ref $_[0] eq 'ARRAY'
-				and scalar @{ $_[0] }
-				and ( grep { $_->isa('POE::Component::SmokeBox::Smoker') } @{ $_[0] } ) == @{ $_[0] };
-		}, 
-	], },
   };
 
   my $args = check( $tmpl, { @_ }, 1 ) or return;
@@ -38,12 +31,6 @@ sub new {
 	type    => sub { defined $_[0]; },
 	command => [ qw(check index smoke) ],
 	module  => sub { defined $_[0]; },
-	smokers => 
-		sub { 
-			return 1 if ref $_[0] eq 'ARRAY'
-				and scalar @{ $_[0] }
-				and ( grep { $_->isa('POE::Component::SmokeBox::Smoker') } @{ $_[0] } ) == @{ $_[0] };
-		}, 
 	id	=> sub { defined $_[0]; },
   };
   $self->mk_accessors( $accessor_map );
@@ -92,9 +79,6 @@ Creates a new POE::Component::SmokeBox::Job object. Takes a number of parameters
   'type', the type of backend to use, default is 'CPANPLUS::YACSmoke';
   'command', the command to run, 'check', 'index' or 'smoke', default is 'check';
   'module', the distribution to smoke, mandatory if command is 'smoke';
-  'smokers', an arrayref of POE::Component::SmokeBox::Smoker objects;
-
-C<smokers> is only required if you are directly using L<POE::Component::SmokeBox::JobQueue>
 
 =back
 
@@ -123,10 +107,6 @@ The command to run, C<'check'>, C<'index'> or C<'smoke'>, default is C<'check'>.
 =item C<module>
 
 The distribution to smoke, mandatory if command is C<'smoke'>.
-
-=item C<smokers>
-
-An arrayref of L<POE::Component::SmokeBox::Smoker> objects
 
 =item C<dump_data>
 

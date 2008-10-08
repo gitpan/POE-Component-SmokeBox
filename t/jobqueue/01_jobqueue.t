@@ -23,8 +23,8 @@ sub _start {
   unshift @path, 'C:' if $^O eq 'MSWin32';
   my $perl = File::Spec->catfile( @path );
   my $smoker = POE::Component::SmokeBox::Smoker->new( perl => $perl );
-  my $job = POE::Component::SmokeBox::Job->new( smokers => [ $smoker ], );
-  my $id = $q->submit( event => '_result', job => $job );
+  my $job = POE::Component::SmokeBox::Job->new();
+  my $id = $q->submit( event => '_result', job => $job, smokers => [ $smoker ] );
   ok( $id, "We got job id '$id'" );
   return;
 }

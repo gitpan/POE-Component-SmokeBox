@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 17;
 use_ok('POE::Component::SmokeBox::Smoker');
 use_ok('POE::Component::SmokeBox::Job');
 use_ok('POE::Component::SmokeBox::Result');
@@ -15,14 +15,14 @@ my %sdump = $smoker->dump_data();
 ok( $sdump{perl} eq $^X, 'The smoker perl was okay' );
 ok( !$sdump{env}, 'We didn\'t set an env' );
 
-my $job = POE::Component::SmokeBox::Job->new( smokers => [ $smoker ] );
+my $job = POE::Component::SmokeBox::Job->new();
 isa_ok( $job, 'POE::Component::SmokeBox::Job' );
 ok( $job->idle() == 600, 'Idle okay' );
 ok( $job->timeout() == 3600, 'Timeout okay' );
 ok( $job->command() eq 'check', 'Check command' );
 ok( $job->type() eq 'CPANPLUS::YACSmoke', 'Type is CPANPLUS::YACSmoke' );
-ok( $job->smokers(), 'There are some smokers' );
-isa_ok( $_, 'POE::Component::SmokeBox::Smoker' ) for @{ $job->smokers() };
+#ok( $job->smokers(), 'There are some smokers' );
+#isa_ok( $_, 'POE::Component::SmokeBox::Smoker' ) for @{ $job->smokers() };
 
 my %jdump = $job->dump_data();
 

@@ -28,8 +28,8 @@ sub _start {
     my $perl = File::Spec->catfile( @path );
     push @smokers, POE::Component::SmokeBox::Smoker->new( perl => $perl );
   }
-  my $job = POE::Component::SmokeBox::Job->new( smokers => \@smokers, );
-  my $id = $q->submit( event => '_result', job => $job );
+  my $job = POE::Component::SmokeBox::Job->new();
+  my $id = $q->submit( event => '_result', job => $job, smokers => \@smokers );
   ok( $id, "We got back the id '$id'" );
   diag("Waiting five seconds for the dust to settle\n");
   ok( scalar $q->pending_jobs() == 1, 'There is one job in the queue' );

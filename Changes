@@ -1,6 +1,11 @@
 POE::Component::SmokeBox ChangeLog
 ==================================
 
+0.01_05 Wed Oct  8 10:37:11 BST 2008
+	- Changed the API for ::Job and ::JobQueue. We don't
+	  define smokers in the Job object now, this was doomed
+	  to fatal failure.
+
 0.01_04	Tue Oct  7 17:20:13 BST 2008
 	- Added loop detection to ::Backend 
 

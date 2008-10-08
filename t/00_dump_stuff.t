@@ -3,27 +3,29 @@ use Config;
 
 my $ok;
 
-warn("\n\nCode borrowed from XML::Twig by MIROD\n");
-warn "\nConfiguration:\n\n";
+diag("\n\nCode borrowed from XML::Twig by MIROD\n");
+diag "\nConfiguration:\n\n";
 
 # required
-warn "perl: $]\n";
-warn "OS: $Config{'osname'} - $Config{'myarchname'}\n";
+diag "perl: $]\n";
+diag "OS: $Config{'osname'} - $Config{'myarchname'}\n";
 
-warn "\n";
+diag "\n";
 
-warn version( 'POE', 'required' );
-warn version( 'Module::Pluggable', 'required' );
-warn version( 'Object::Accessor', 'required' );
-warn version( 'Params::Check', 'required' );
-warn version( 'Digest::MD5', 'required' );
+diag version( 'POE', 'required' );
+diag version( 'Module::Pluggable', 'required' );
+diag version( 'Object::Accessor', 'required' );
+diag version( 'Params::Check', 'required' );
+diag version( 'Digest::MD5', 'required' );
 
-warn "\n";
+diag "\n";
 
-warn version( 'Test::More', 'required for build' );
-warn version( 'File::Spec', 'required for build' );
+diag version( 'Test::More', 'required for build' );
+diag version( 'File::Spec', 'required for build' );
 
-warn "\n";
+diag "\n";
+
+sleep 1;
 
 pass("Everything is cool");
 

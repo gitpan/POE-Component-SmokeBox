@@ -93,9 +93,7 @@ sub _process_queue {
   else {
      $job = $self->_shift();
      return unless $job;
-     my @smokers = @{ $job->{job}->smokers() };
-     $smoker = shift @smokers;
-     $job->{smokers} = \@smokers;
+     $smoker = shift @{ $job->{smokers} };
      $job->{result} = POE::Component::SmokeBox::Result->new();
      $self->{_current} = $job;
   }
@@ -138,15 +136,19 @@ sub _submit {
      type    => { defined => 1, allow => [qw(push unshift)], default => 'push', },
      job     => { required => 1, defined => 1, 
 		  allow => [ sub { return 1 if ref $_[0] and $_[0]->isa('POE::Component::SmokeBox::Job'); }, ], },
+     smokers => { required => 1, defined => 1, allow => [
+                sub {
+                        return 1 if ref $_[0] eq 'ARRAY'
+                                and scalar @{ $_[0] }
+                                and ( grep { $_->isa('POE::Component::SmokeBox::Smoker') } @{ $_[0] } ) == @{ $_[0] };
+                    }, ],
+		},
+
   };
 
   my $checked = check( $tmpl, $args, 1 ) or return;
   $checked->{session} = $kernel->alias_resolve( $checked->{session} )->ID() if $checked->{session};
   $checked->{session} = $sender->ID() unless $checked->{session};
-  unless ( $checked->{job}->smokers() ) {
-    warn "The specified 'POE::Component::SmokeBox::Job' object does not have any smokers defined\n";
-    return;
-  }
   my $type = delete $checked->{type};
   my $id = $self->_add_job( $checked, $type );
   return unless $id;
@@ -316,13 +318,12 @@ POE::Component::SmokeBox::JobQueue - An array based queue for SmokeBox
   sub _start {
     my $smoker = POE::Component::SmokeBox::Smoker->new( perl => $perl );
     my $job = POE::Component::SmokeBox::Job->new( 
-	smokers => [ $smoker ], 
 	type => 'CPANPLUS::YACSmoke',
 	command => 'smoke',
 	module => 'B/BI/BINGOS/POE-Component-IRC-5.88.tar.gz',
     );
 
-    my $id = $q->submit( event => '_result', job => $job );
+    my $id = $q->submit( event => '_result', job => $job, smokers => [ $smoker ] );
     print "Job ID $id submitted\n";
 
     return;
@@ -379,6 +380,7 @@ Submits a job to the jobqueue for processing. Takes a number of parameters:
 
   'job', a POE::Component::SmokeBox::Job object, mandatory;
   'event', the event to send results to, mandatory;
+  'smokers', an arrayref of POE::Component::SmokeBox::Smoker objects, mandatory;
   'session', the session to send results to, default is the sender;
   'type', specify the job priority, 'push' or 'unshift', defaults to 'push';
 
