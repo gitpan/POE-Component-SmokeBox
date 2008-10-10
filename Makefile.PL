@@ -6,6 +6,7 @@ license 'perl';
 perl_version '5.006';
 abstract_from 'lib/POE/Component/SmokeBox.pm';
 version_from 'lib/POE/Component/SmokeBox.pm';
+build_requires 'Test::Harness' => 3.14;
 build_requires 'Test::More' => 0.47;
 build_requires 'File::Spec' => 0;
 requires 'POE' => 1.0001;

@@ -1,6 +1,10 @@
 POE::Component::SmokeBox ChangeLog
 ==================================
 
+0.01_07	Fri Oct 10 22:46:40 BST 2008
+	- Trying to see if it is a problem with older T::H for
+	  hangs on certain CPAN tester configurations.
+
 0.01_06	Wed Oct  8 16:24:59 BST 2008
 	- Fixed a problem with the 00_dump_stuff.t test.
 
