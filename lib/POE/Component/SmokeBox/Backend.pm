@@ -41,6 +41,7 @@ sub spawn {
   }
   $opts{idle} = 600 unless $opts{idle};
   $opts{timeout} = 3600 unless $opts{timeout};
+  $opts{timer} = 60 unless $opts{timer};
   $opts{type} = 'CPANPLUS::YACSmoke' unless $opts{type};
   $opts{command} = lc $opts{command} || 'check';
   $opts{command} = 'check' unless grep { $_ eq $opts{command} } @cmds;
@@ -156,10 +157,10 @@ sub _spawn_wheel {
   $self->{_wheel_log} = [ ];
   $self->{_digests} = { };
   $self->{_loop_detect} = 0;
-  $self->{start_time} = time();
+  $self->{start_time} = $self->{_wheel_time} = time();
   $self->{PID} = $self->{wheel}->PID();
   $kernel->sig_child( $self->{PID}, '_sig_child' );
-  $kernel->delay( '_wheel_idle', 60 ) unless $self->{command} eq 'index';
+  $kernel->delay( '_wheel_idle', $self->{timer} ) unless $self->{command} eq 'index';
   return;
 }
 

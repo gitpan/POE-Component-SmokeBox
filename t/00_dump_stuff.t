@@ -1,7 +1,11 @@
-use Test::More tests => 1;
+use Test::More tests => 2;
 use Config;
 
+use_ok("POE::Component::SmokeBox");
+
 my $ok;
+
+diag("\n\nTesting POE::Component::SmokeBox-" . POE::Component::SmokeBox->VERSION() . "\n\n");
 
 diag("\n\nCode borrowed from XML::Twig by MIROD\n");
 diag("\nConfiguration:\n\n");

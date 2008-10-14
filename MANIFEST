@@ -14,6 +14,9 @@ lib/POE/Component/SmokeBox/Backend/Base.pm
 lib/POE/Component/SmokeBox/Backend/CPAN/Reporter.pm
 lib/POE/Component/SmokeBox/Backend/CPAN/YACSmoke.pm
 lib/POE/Component/SmokeBox/Backend/CPANPLUS/YACSmoke.pm
+lib/POE/Component/SmokeBox/Backend/Test/Idle.pm
+lib/POE/Component/SmokeBox/Backend/Test/Excess.pm
+lib/POE/Component/SmokeBox/Backend/Test/Loop.pm
 lib/POE/Component/SmokeBox/Job.pm
 lib/POE/Component/SmokeBox/JobQueue.pm
 lib/POE/Component/SmokeBox/Result.pm
@@ -44,6 +47,9 @@ t/backend/04_index_rep.t
 t/backend/04_smoke_rep.t
 t/backend/05_env.t
 t/backend/06_false_backend.t
+t/backend/07_test_idle.t
+t/backend/08_test_excess.t
+t/backend/09_test_loop.t
 t/jobqueue/00_compile.t
 t/jobqueue/01_jobqueue.t
 t/jobqueue/02_smokers.t
