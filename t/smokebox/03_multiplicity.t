@@ -22,16 +22,14 @@ exit 0;
 sub _start {
   my $heap = $_[HEAP];
   for ( 0 .. 4 ) {
-    my @path = qw(COMPLETELY MADE UP PATH TO PERL);
-    unshift @path, 'C:' if $^O eq 'MSWin32';
-    my $perl = File::Spec->catfile( @path );
+    my $perl = $^X;
     my $smoker = POE::Component::SmokeBox::Smoker->new( perl => $perl );
     $smokebox->add_smoker( $smoker );
     $heap->{_smokers}++;
     $heap->{smoker} = $smoker if $_ == 0;
   }
   ok( scalar $smokebox->queues() == 5, 'There are five jobqueues' );
-  my $job = POE::Component::SmokeBox::Job->new();
+  my $job = POE::Component::SmokeBox::Job->new( type => 'Test::Idle' );
   $poe_kernel->post( $smokebox->session_id(), 'submit', job => $job, event => '_results', );
   $poe_kernel->delay( '_terminate', 60 );
   return;
@@ -54,7 +52,7 @@ sub _results {
   ok( scalar $results->{result}->results() == 1, 'There was only one result' );
   foreach my $res ( $results->{result}->results() ) {
      ok( ref $res eq 'HASH', 'The result is a hashref' );
-     ok( $res->{$_}, "There is a '$_' entry" ) for qw(PID status start_time end_time perl log type command);
+     ok( defined $res->{$_}, "There is a '$_' entry" ) for qw(PID status start_time end_time perl log type command);
   }
   if ( $heap->{smoker} ) {
      $smokebox->del_smoker( delete $_[HEAP]->{smoker} );

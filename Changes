@@ -1,6 +1,10 @@
 POE::Component::SmokeBox ChangeLog
 ==================================
 
+0.01_10	Wed Oct 22 21:49:08 BST 2008
+	- Amended the tests that were wacking out on Dragonflybsd 
+	  and certain fbsd boxen.
+
 0.01_09	Mon Oct 20 15:53:20 BST 2008
 	- Amended some of the longer running tests.
 
