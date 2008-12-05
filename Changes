@@ -1,6 +1,9 @@
 POE::Component::SmokeBox ChangeLog
 ==================================
 
+0.04	Fri Dec  5 12:33:50 GMT 2008
+	- 'kill' hackery in Backend for solaris
+
 0.01_10	Wed Oct 22 21:49:08 BST 2008
 	- Amended the tests that were wacking out on Dragonflybsd 
 	  and certain fbsd boxen.

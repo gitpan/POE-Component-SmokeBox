@@ -9,7 +9,7 @@ use Digest::MD5 qw(md5_hex);
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 use vars qw($VERSION);
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 my @cmds = qw(check index smoke);
 
@@ -260,7 +260,12 @@ sub _wheel_kill {
   }
   else {
     if ( !$self->{no_grp_kill} ) {
-      $self->{wheel}->kill(-9) if $self->{wheel};
+      if ( $^O eq 'solaris' ) {
+	 kill( 9, '-' . $self->{wheel}->PID() ) if $self->{wheel};
+      }
+      else {
+         $self->{wheel}->kill(-9) if $self->{wheel};
+      }
     }
 #    elsif ( $GOT_KILLFAM ) {
 #      _kill_family( 9, $self->{wheel}->PID() ) if $self->{wheel};
