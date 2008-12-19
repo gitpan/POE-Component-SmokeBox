@@ -14,6 +14,17 @@ requires 'Module::Pluggable' => 0;
 requires 'Params::Check' => 0;
 requires 'Object::Accessor' => 0;
 requires 'Digest::MD5' => 0;
+
+eval "require IO::Pty";
+if ( $@ ) {
+    requires 'IO::Pty' => 0 if
+       prompt( 'Do you want to install IO::Pty, it is highly recommended that you do [Y/n]?', 'Y' )
+         =~ /^Y/i;
+}
+else {
+     warn "You already have IO::Pty installed, excellent.\n";
+}
+
 tests 't/*.t t/*/*.t';
 
 print <<NOTICE;

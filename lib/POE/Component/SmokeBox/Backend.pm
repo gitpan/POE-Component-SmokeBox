@@ -9,7 +9,23 @@ use Digest::MD5 qw(md5_hex);
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 use vars qw($VERSION);
 
-$VERSION = '0.02';
+$VERSION = '0.04';
+
+my $GOT_KILLFAM;
+my $GOT_PTY;
+
+BEGIN {
+        $GOT_KILLFAM = 0;
+        eval {
+                require Proc::ProcessTable;
+                $GOT_KILLFAM = 1;
+        };
+        $GOT_PTY = 0;
+        eval {
+                require IO::Pty;
+                $GOT_PTY = 1;
+        };
+}
 
 my @cmds = qw(check index smoke);
 
@@ -150,6 +166,7 @@ sub _spawn_wheel {
     StderrEvent => '_wheel_stderr',
     ErrorEvent  => '_wheel_error',
     CloseEvent  => '_wheel_close',
+    ( $GOT_PTY ? ( Conduit => 'pty-pipe' ) : () ),
   );
   # Restore the %ENV values
   delete $ENV{$_} for keys %{ $self->{env} };

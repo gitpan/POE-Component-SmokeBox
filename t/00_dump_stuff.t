@@ -21,6 +21,7 @@ diag( version( 'Module::Pluggable', 'required' ) );
 diag( version( 'Object::Accessor', 'required' ) );
 diag( version( 'Params::Check', 'required' ) );
 diag( version( 'Digest::MD5', 'required' ) );
+diag( version( 'IO::Pty', 'strongly recommended' ) );
 
 diag "\n";
 

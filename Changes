@@ -1,6 +1,10 @@
 POE::Component::SmokeBox ChangeLog
 ==================================
 
+0.06	Fri Dec 19 09:20:42 GMT 2008
+	- Added 'pty-pipe' conduit and IO::Pty as a strongly 
+	  recommended prereq.
+
 0.04	Fri Dec  5 12:33:50 GMT 2008
 	- 'kill' hackery in Backend for solaris
 
