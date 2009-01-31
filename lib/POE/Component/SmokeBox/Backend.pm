@@ -9,7 +9,7 @@ use Digest::MD5 qw(md5_hex);
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 use vars qw($VERSION);
 
-$VERSION = '0.04';
+$VERSION = '0.06';
 
 my $GOT_KILLFAM;
 my $GOT_PTY;
@@ -25,6 +25,9 @@ BEGIN {
                 require IO::Pty;
                 $GOT_PTY = 1;
         };
+	if ( $^O eq 'MSWin32' ) {
+		require POE::Wheel::Run::Win32;
+	}
 }
 
 my @cmds = qw(check index smoke);
@@ -159,7 +162,9 @@ sub _spawn_wheel {
      $env_back_up{$_} = delete $ENV{$_} for grep { defined $ENV{$_} } keys %{ $self->{env} };
      $ENV{$_} = $self->{env}->{$_} for keys %{ $self->{env} };
   }
-  $self->{wheel} = POE::Wheel::Run->new(
+  my $type = 'POE::Wheel::Run';
+  $type .= '::Win32' if $^O eq 'MSWin32';
+  $self->{wheel} = $type->new(
     Program     => $self->{program},
 #    ProgramArgs => $job->{program_args},
     StdoutEvent => '_wheel_stdout',
@@ -269,11 +274,7 @@ sub _wheel_kill {
   push @{ $self->{_wheel_log} }, $reason;
   warn $reason, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   if ( $^O eq 'MSWin32' and $self->{wheel} ) {
-#    my $grp_pid = $self->{_current_job}->{GRP_PID};
-#    return unless $grp_pid;
-#    warn Win32::FormatMessage( Win32::GetLastError() )
-#	unless Win32::Process::KillProcess( $grp_pid, 0 );
-    # TODO
+    $self->{wheel}->kill();
   }
   else {
     if ( !$self->{no_grp_kill} ) {

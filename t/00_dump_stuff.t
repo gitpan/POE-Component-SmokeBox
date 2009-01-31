@@ -1,6 +1,8 @@
 use Test::More tests => 2;
 use Config;
 
+my $RUNNING_IN_HELL = $^O eq 'MSWin32' ? 1 : 0;
+
 use_ok("POE::Component::SmokeBox");
 
 my $ok;
@@ -21,7 +23,8 @@ diag( version( 'Module::Pluggable', 'required' ) );
 diag( version( 'Object::Accessor', 'required' ) );
 diag( version( 'Params::Check', 'required' ) );
 diag( version( 'Digest::MD5', 'required' ) );
-diag( version( 'IO::Pty', 'strongly recommended' ) );
+diag( version( 'IO::Pty', 'strongly recommended' ) ) unless $RUNNING_IN_HELL;
+diag( version( 'POE::Wheel::Run::Win32', 'required' ) ) if $RUNNING_IN_HELL;
 
 diag "\n";
 

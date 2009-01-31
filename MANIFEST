@@ -14,8 +14,8 @@ lib/POE/Component/SmokeBox/Backend/Base.pm
 lib/POE/Component/SmokeBox/Backend/CPAN/Reporter.pm
 lib/POE/Component/SmokeBox/Backend/CPAN/YACSmoke.pm
 lib/POE/Component/SmokeBox/Backend/CPANPLUS/YACSmoke.pm
-lib/POE/Component/SmokeBox/Backend/Test/Idle.pm
 lib/POE/Component/SmokeBox/Backend/Test/Excess.pm
+lib/POE/Component/SmokeBox/Backend/Test/Idle.pm
 lib/POE/Component/SmokeBox/Backend/Test/Loop.pm
 lib/POE/Component/SmokeBox/Job.pm
 lib/POE/Component/SmokeBox/JobQueue.pm
