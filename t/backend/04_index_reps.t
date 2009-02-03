@@ -1,19 +1,13 @@
 use strict;
 use warnings;
 use File::Spec;
-use Test::More; # tests => 13;
-
-BEGIN {
-    plan skip_all => 'Currently broken on Solaris, skipping' if $^O eq 'solaris';
-}
-
-plan tests => 13;
-
+use Test::More tests => 11;
 use POE;
 use_ok('POE::Component::SmokeBox::Backend');
 
-my $perl = $^X;
-my $module = 'F/FU/FUBAR/Fubar-1.00.tar.gz';
+my @path = qw(COMPLETELY MADE UP PATH TO PERL);
+unshift @path, 'C:' if $^O eq 'MSWin32';
+my $perl = File::Spec->catfile( @path );
 
 POE::Session->create(
    package_states => [
@@ -26,17 +20,14 @@ exit 0;
 
 sub _start {
   my ($kernel,$heap) = @_[KERNEL,HEAP];
-  my $backend = POE::Component::SmokeBox::Backend->smoke( 
-	type => 'Test::Loop',
+  my $backend = POE::Component::SmokeBox::Backend->index( 
+	type => 'CPAN::Reporter::Smoker',
 	event => '_results', 
 	perl => $perl, 
-	module => $module,
 	debug => 0,
-	options => { trace => 0 },
   );
   isa_ok( $backend, 'POE::Component::SmokeBox::Backend' );
-  diag("Waiting for the loop detection kill - could be anytime really.\n");
-  $kernel->delay( '_timeout', 50 );
+  $kernel->delay( '_timeout', 60 );
   return;
 }
 
@@ -49,9 +40,7 @@ sub _results {
   my ($kernel,$heap,$result) = @_[KERNEL,HEAP,ARG0];
   ok( $result->{$_}, "Found '$_'" ) for qw(command PID start_time end_time log status);
   ok( ref $result->{log} eq 'ARRAY', 'The log entry is an arrayref' );
-  ok( $result->{module} eq $module, $module );
-  ok( $result->{command} eq 'smoke', "We're smoking!" );
-  ok( $result->{excess_kill}, 'We got killed due to idle' );
+  ok( $result->{command} eq 'index', "We're indexing!" );
   $kernel->delay( '_timeout' );
   return;
 }
