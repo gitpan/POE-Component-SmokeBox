@@ -162,6 +162,8 @@ sub _spawn_wheel {
      $env_back_up{$_} = delete $ENV{$_} for grep { defined $ENV{$_} } keys %{ $self->{env} };
      $ENV{$_} = $self->{env}->{$_} for keys %{ $self->{env} };
   }
+  # Don't pass POE debug ENV vars to the forked process.
+  $env_back_up{$_} = delete $ENV{$_} for grep { /^POE_/ } keys %ENV;
   my $type = 'POE::Wheel::Run';
   $type .= '::Win32' if $^O eq 'MSWin32';
   $self->{wheel} = $type->new(
