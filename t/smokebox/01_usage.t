@@ -33,6 +33,7 @@ sub _start {
 
 sub _stop {
   pass('Poco let go of our reference');
+  $smokebox->shutdown();
   return;
 }
 
@@ -48,6 +49,5 @@ sub _results {
   }
   $smokebox->del_smoker( $_[HEAP]->{smoker} );
   ok( scalar $smokebox->queues() == 0, 'There are no jobqueues' );
-  $smokebox->shutdown();
   return;
 }

@@ -21,12 +21,12 @@ exit 0;
 
 sub _start {
   my $heap = $_[HEAP];
-  for ( 0 .. 4 ) {
+  for ( 1 .. 5 ) {
     my $perl = $^X;
     my $smoker = POE::Component::SmokeBox::Smoker->new( perl => $perl );
     $smokebox->add_smoker( $smoker );
     $heap->{_smokers}++;
-    $heap->{smoker} = $smoker if $_ == 0;
+    $heap->{smoker} = $smoker if $_ == 1;
   }
   ok( scalar $smokebox->queues() == 5, 'There are five jobqueues' );
   my $job = POE::Component::SmokeBox::Job->new( type => 'Test::Idle' );
@@ -37,6 +37,7 @@ sub _start {
 
 sub _stop {
   pass('Poco let go of our reference');
+  $smokebox->shutdown();
   return;
 }
 
@@ -60,7 +61,6 @@ sub _results {
   }
   $heap->{_smokers}--;
   return if $heap->{_smokers};
-  $smokebox->shutdown();
   $kernel->delay( '_terminate' );
   return;
 }

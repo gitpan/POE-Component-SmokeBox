@@ -8,7 +8,7 @@ use POE::Component::SmokeBox::Job;
 use POE::Component::SmokeBox::Result;
 use vars qw($VERSION);
 
-$VERSION = '0.12';
+$VERSION = '0.14';
 
 sub spawn {
   my $package = shift;
@@ -131,7 +131,7 @@ sub _del_smoker {
 
 sub submit {
   my $self = shift;
-  $poe_kernel->call( $self->{session_id}, '_submit', @_ );
+  $poe_kernel->call( $self->{session_id}, 'submit', @_ );
 }
 
 sub _submit {
@@ -174,7 +174,7 @@ sub _submit {
   return;
 }
 
-1;
+"We've Got a Fuzzbox and We're Gonna Use It";
 
 __END__
 
@@ -208,9 +208,9 @@ POE::Component::SmokeBox - POE enabled CPAN smoke testing with added value.
   
   POE::Session->create(
         package_states => [
-           'main' => [ qw(_start _stop _results _recent) ],
+           'main' => [ qw(_start _stop _results) ],
         ],
-        heap => { perl => $perl, pending => { @ARGV },
+        heap => { perl => $perl, pending => [ @ARGV ] },
   );
   
   $poe_kernel->run();
@@ -235,7 +235,7 @@ POE::Component::SmokeBox - POE enabled CPAN smoke testing with added value.
   }
   
   sub _results {
-    my $result = $_[ARG0];
+    my $results = $_[ARG0];
     print $_, "\n" for map { @{ $_->{log} } } $results->{result}->results();
     undef;
   }

@@ -1,6 +1,11 @@
 POE::Component::SmokeBox ChangeLog
 ==================================
 
+0.14	Thu Feb  5 22:36:53 GMT 2009
+	- [rt #43027] Applied patch from oxdeadbeef
+	- Fixed refcount management in JobQueue
+	- Overhauled the testsuite.
+
 0.12	Wed Feb  4 10:56:50 GMT 2009
 	- Stop POE debug ENV vars propagating to the forked process.
 

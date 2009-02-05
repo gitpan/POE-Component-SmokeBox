@@ -6,6 +6,7 @@ use Carp;
 use Storable;
 use POE qw(Wheel::Run);
 use Digest::MD5 qw(md5_hex);
+use Env::Sanctify;
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 use vars qw($VERSION);
 
@@ -156,19 +157,11 @@ sub _shutdown {
 sub _spawn_wheel {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
   # Set appropriate %ENV values before we fork()
-  my %env_back_up;
-  if ( $self->{env} and ref $self->{env} eq 'HASH' ) {
-     # backup the current values;
-     $env_back_up{$_} = delete $ENV{$_} for grep { defined $ENV{$_} } keys %{ $self->{env} };
-     $ENV{$_} = $self->{env}->{$_} for keys %{ $self->{env} };
-  }
-  # Don't pass POE debug ENV vars to the forked process.
-  $env_back_up{$_} = delete $ENV{$_} for grep { /^POE_/ } keys %ENV;
+  my $sanctify = Env::Sanctify->sanctify( env => $self->{env}, sanctify => ['^POE\_'] );
   my $type = 'POE::Wheel::Run';
   $type .= '::Win32' if $^O eq 'MSWin32';
   $self->{wheel} = $type->new(
     Program     => $self->{program},
-#    ProgramArgs => $job->{program_args},
     StdoutEvent => '_wheel_stdout',
     StderrEvent => '_wheel_stderr',
     ErrorEvent  => '_wheel_error',
@@ -176,8 +169,7 @@ sub _spawn_wheel {
     ( $GOT_PTY ? ( Conduit => 'pty-pipe' ) : () ),
   );
   # Restore the %ENV values
-  delete $ENV{$_} for keys %{ $self->{env} };
-  $ENV{$_} = $env_back_up{$_} for keys %env_back_up;
+  $sanctify->restore();
   $self->{_wheel_log} = [ ];
   $self->{_digests} = { };
   $self->{_loop_detect} = 0;

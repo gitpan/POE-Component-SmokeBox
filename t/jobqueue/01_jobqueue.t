@@ -5,7 +5,7 @@ use Test::More tests => 18;
 use_ok('POE::Component::SmokeBox::JobQueue');
 use POE qw(Component::SmokeBox::Job Component::SmokeBox::Smoker);
 
-my $q = POE::Component::SmokeBox::JobQueue->spawn();
+my $q = POE::Component::SmokeBox::JobQueue->spawn( options => { trace => 0 }, );
 isa_ok( $q, 'POE::Component::SmokeBox::JobQueue' );
 ok( scalar $q->pending_jobs() == 0, 'No pending jobs' );
 
@@ -31,6 +31,7 @@ sub _start {
 
 sub _stop {
   pass('The poco released our reference');
+  $q->shutdown();
   return;
 }
 
@@ -44,6 +45,5 @@ sub _result {
      ok( ref $res eq 'HASH', 'The result is a hashref' );
      ok( $res->{$_}, "There is a '$_' entry" ) for qw(PID status start_time end_time perl log type command);
   }
-  $q->shutdown();
   return;
 }

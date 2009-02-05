@@ -20,7 +20,7 @@ exit 0;
 
 sub _start {
   my @smokers;
-  for ( 0 .. 4 ) {
+  for ( 1 .. 5 ) {
     my @path = qw(COMPLETELY MADE UP PATH TO PERL);
     unshift @path, 'C:' if $^O eq 'MSWin32';
     my $perl = File::Spec->catfile( @path );
@@ -34,6 +34,7 @@ sub _start {
 
 sub _stop {
   pass('The poco released our reference');
+  $q->shutdown();
   return;
 }
 
@@ -47,6 +48,5 @@ sub _result {
      ok( ref $res eq 'HASH', 'The result is a hashref' );
      ok( $res->{$_}, "There is a '$_' entry" ) for qw(PID status start_time end_time perl log type command);
   }
-  $q->shutdown();
   return;
 }

@@ -7,6 +7,7 @@ inc/Module/Install/Fetch.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
+inc/Module/Install/With.pm
 inc/Module/Install/WriteAll.pm
 lib/POE/Component/SmokeBox.pm
 lib/POE/Component/SmokeBox/Backend.pm
@@ -18,6 +19,7 @@ lib/POE/Component/SmokeBox/Backend/CPANPLUS/YACSmoke.pm
 lib/POE/Component/SmokeBox/Backend/Test/Excess.pm
 lib/POE/Component/SmokeBox/Backend/Test/Idle.pm
 lib/POE/Component/SmokeBox/Backend/Test/Loop.pm
+lib/POE/Component/SmokeBox/Backend/Test/Stress.pm
 lib/POE/Component/SmokeBox/Job.pm
 lib/POE/Component/SmokeBox/JobQueue.pm
 lib/POE/Component/SmokeBox/Result.pm
@@ -67,5 +69,6 @@ t/smokebox/03_multiplicity.t
 t/smokebox/04_smokers_more.t
 t/smokebox/05_multi_smoke.t
 t/smokebox/06_many_jobs.t
+t/smokebox/07_stress.t
 t/zauth/99_pod.t
 t/zauth/99_pod_coverage.t

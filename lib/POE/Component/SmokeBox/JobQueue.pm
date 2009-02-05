@@ -39,7 +39,7 @@ sub session_id {
 
 sub shutdown {
   my $self = shift;
-  $poe_kernel->post( $self->session_id() => 'shutdown' => @_ );
+  $poe_kernel->call( $self->session_id() => 'shutdown' => @_ );
 }
 
 sub _start {
@@ -67,13 +67,15 @@ sub _shutdown {
   # shutdown currently running backend
   $self->{_current}->{backend}->shutdown() if $self->{_current}->{backend};
   # remove queued jobs.
-  $kernel->refcount_decrement( $_->{session}, __PACKAGE__ ) for @{ $self->{_queue} };
+#  $kernel->refcount_decrement( $_->{session}, __PACKAGE__ ) for @{ $self->{_queue} };
+  $kernel->refcount_decrement( $_, __PACKAGE__ ) for keys %{ $self->{_refcounts} };
   delete $self->{_queue};
   return;
 }
 
 sub _process_queue {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
+  return if $self->{_shutdown};
   my ($job, $smoker );
   if ( $self->{_current} ) {
      return if $self->{_current}->{backend};
@@ -85,7 +87,11 @@ sub _process_queue {
 	delete $job->{smokers};
 	my $session = delete $job->{session};
 	$kernel->post( $session, delete $job->{event}, $job );
-	$kernel->refcount_decrement( $session, __PACKAGE__ );
+	$self->{_refcounts}->{ $session }--;
+	if ( $self->{_refcounts}->{ $session } <= 0 ) {
+	   $kernel->refcount_decrement( $session, __PACKAGE__ );
+	   delete $self->{_refcounts}->{ $session };
+	}
   	$kernel->yield( '_process_queue' );
 	return;
      }
@@ -152,7 +158,10 @@ sub _submit {
   my $type = delete $checked->{type};
   my $id = $self->_add_job( $checked, $type );
   return unless $id;
-  $kernel->refcount_increment( $checked->{session}, __PACKAGE__ );
+  unless ( defined $self->{_refcounts}->{ $checked->{session} } ) {
+    $kernel->refcount_increment( $checked->{session}, __PACKAGE__ );
+  }
+  $self->{_refcounts}->{ $checked->{session} }++;
   $checked->{submitted} = time();
   #$checked->{job}->id( $id );
   return $id;
@@ -299,7 +308,7 @@ POE::Component::SmokeBox::JobQueue - An array based queue for SmokeBox
 
   use strict;
   use warnings;
-  use Data::Dumper;
+  use data::Dumper;
   use POE qw(Component::SmokeBox::JobQueue Component::SmokeBox::Job Component::SmokeBox::Smoker);
 
   my $perl = 'home/cpan/rel/perl-5.8.8/bin/perl';

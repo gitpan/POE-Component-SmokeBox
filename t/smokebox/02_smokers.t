@@ -19,13 +19,13 @@ $poe_kernel->run();
 exit 0;
 
 sub _start {
-  for ( 0 .. 4 ) {
+  for ( 1 .. 5 ) {
     my @path = qw(COMPLETELY MADE UP PATH TO PERL);
     unshift @path, 'C:' if $^O eq 'MSWin32';
     my $perl = File::Spec->catfile( @path );
     my $smoker = POE::Component::SmokeBox::Smoker->new( perl => $perl );
     $smokebox->add_smoker( $smoker );
-    $_[HEAP]->{smoker} = $smoker if $_ == 0;
+    $_[HEAP]->{smoker} = $smoker if $_ == 1;
   }
   ok( scalar $smokebox->queues() == 1, 'There is one jobqueue' );
   my $job = POE::Component::SmokeBox::Job->new();
@@ -35,6 +35,7 @@ sub _start {
 
 sub _stop {
   pass('Poco let go of our reference');
+  $smokebox->shutdown();
   return;
 }
 
@@ -50,6 +51,5 @@ sub _results {
   }
   $smokebox->del_smoker( $_[HEAP]->{smoker} );
   ok( scalar $smokebox->queues() == 1, 'There is one jobqueue' );
-  $smokebox->shutdown();
   return;
 }

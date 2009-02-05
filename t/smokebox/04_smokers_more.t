@@ -6,7 +6,7 @@ use_ok('POE::Component::SmokeBox');
 use POE qw(Component::SmokeBox::Smoker Component::SmokeBox::Job);
 
 my @smokers;
-for ( 0 .. 4 ) {
+for ( 1 .. 5 ) {
     my $perl = $^X;
     my $smoker = POE::Component::SmokeBox::Smoker->new( perl => $perl );
     push @smokers, $smoker;
@@ -34,6 +34,7 @@ sub _start {
 
 sub _stop {
   pass('Poco let go of our reference');
+  $smokebox->shutdown();
   return;
 }
 
@@ -49,6 +50,5 @@ sub _results {
   }
   $smokebox->del_smoker( $_[HEAP]->{smoker} );
   ok( scalar $smokebox->queues() == 1, 'There is one jobqueue' );
-  $smokebox->shutdown();
   return;
 }

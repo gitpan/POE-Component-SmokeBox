@@ -64,7 +64,7 @@
   }
   
   sub _results {
-    my $result = $_[ARG0];
+    my $results = $_[ARG0];
     print $_, "\n" for map { @{ $_->{log} } } $results->{result}->results();
     undef;
   }

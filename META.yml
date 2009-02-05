@@ -7,7 +7,7 @@ build_requires:
   Test::Harness: 3.14
   Test::More: 0.47
 distribution_type: module
-generated_by: 'Module::Install version 0.78'
+generated_by: 'Module::Install version 0.79'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,6 +20,7 @@ no_index:
     - t
 requires:
   Digest::MD5: 0
+  Env::Sanctify: 0
   Module::Pluggable: 0
   Object::Accessor: 0
   POE: 1.0001
@@ -27,4 +28,4 @@ requires:
   perl: 5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.12
+version: 0.14
