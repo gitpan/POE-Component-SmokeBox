@@ -157,7 +157,14 @@ sub _shutdown {
 sub _spawn_wheel {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
   # Set appropriate %ENV values before we fork()
-  my $sanctify = Env::Sanctify->sanctify( env => $self->{env}, sanctify => ['^POE\_'] );
+  my $sanctify = Env::Sanctify->sanctify( 
+	env => $self->{env}, 
+	sanctify => [
+			'^POE_',
+			'^PERL5_SMOKEBOX',
+			'^HARNESS_',
+			'^(PERL5LIB|TAP_VERSION|TEST_VERBOSE)$',
+  ] );
   my $type = 'POE::Wheel::Run';
   $type .= '::Win32' if $^O eq 'MSWin32';
   $self->{wheel} = $type->new(

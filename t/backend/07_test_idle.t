@@ -28,6 +28,7 @@ sub _start {
 	timer => 15,
 	debug => 0,
 	options => { trace => 0 },
+	( $ENV{AUTOMATED_TESTING} ? ( no_grp_kill => 1 ) : () ),
   );
   isa_ok( $backend, 'POE::Component::SmokeBox::Backend' );
   diag("Waiting for the idle kill - should be 10 seconds or so\n");

@@ -16,7 +16,7 @@ requires 'Module::Pluggable' => 0;
 requires 'Params::Check' => 0;
 requires 'Object::Accessor' => 0;
 requires 'Digest::MD5' => 0;
-requires 'Env::Sanctify' => 0;
+requires 'Env::Sanctify' => 0.04;
 
 unless ( can_use 'IO::Pty' and not win32 ) {
     requires 'IO::Pty' => 0 if

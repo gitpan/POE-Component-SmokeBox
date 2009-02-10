@@ -29,6 +29,7 @@ sub _start {
 	timeout => 15,
 	debug => 0,
 	options => { trace => 0 },
+	( $ENV{AUTOMATED_TESTING} ? ( no_grp_kill => 1 ) : () ),
   );
   isa_ok( $backend, 'POE::Component::SmokeBox::Backend' );
   diag("Waiting for the excessive run kill - should be 15 seconds or so\n");

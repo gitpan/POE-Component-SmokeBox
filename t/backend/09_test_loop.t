@@ -33,6 +33,7 @@ sub _start {
 	module => $module,
 	debug => 0,
 	options => { trace => 0 },
+	( $ENV{AUTOMATED_TESTING} ? ( no_grp_kill => 1 ) : () ),
   );
   isa_ok( $backend, 'POE::Component::SmokeBox::Backend' );
   diag("Waiting for the loop detection kill - could be anytime really.\n");

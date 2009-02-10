@@ -1,6 +1,12 @@
 POE::Component::SmokeBox ChangeLog
 ==================================
 
+0.16	Tue Feb 10 12:41:00 GMT 2009
+	- Found a bug in Env::Sanctify, which is fixed.
+	- Sanctify %ENV really well before forking.
+	- Detect AUTOMATED_TESTING in kill tests and use 
+	  no_grp_kill => 1 
+
 0.14	Thu Feb  5 22:36:53 GMT 2009
 	- [rt #43027] Applied patch from oxdeadbeef
 	- Fixed refcount management in JobQueue
