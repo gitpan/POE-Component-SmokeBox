@@ -8,7 +8,7 @@ use POE::Component::SmokeBox::Job;
 use POE::Component::SmokeBox::Result;
 use vars qw($VERSION);
 
-$VERSION = '0.16';
+$VERSION = '0.18';
 
 sub spawn {
   my $package = shift;

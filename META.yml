@@ -25,7 +25,8 @@ requires:
   Object::Accessor: 0
   POE: 1.0001
   Params::Check: 0
+  String::Perl::Warnings: 0.04
   perl: 5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.16
+version: 0.18

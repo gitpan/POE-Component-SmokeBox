@@ -7,6 +7,7 @@ use Storable;
 use POE qw(Wheel::Run);
 use Digest::MD5 qw(md5_hex);
 use Env::Sanctify;
+use String::Perl::Warnings qw(is_warning);
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 use vars qw($VERSION);
 
@@ -221,6 +222,7 @@ sub _wheel_closed {
 
 sub _wheel_stdout {
   my ($self, $input, $wheel_id) = @_[OBJECT, ARG0, ARG1];
+  return if $self->{_killed};
   $self->{_wheel_time} = time();
   push @{ $self->{_wheel_log} }, $input;
   warn $input, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
@@ -233,6 +235,7 @@ sub _wheel_stdout {
 
 sub _wheel_stderr {
   my ($self, $input, $wheel_id) = @_[OBJECT, ARG0, ARG1];
+  return if $self->{_killed};
   $self->{_wheel_time} = time();
   push @{ $self->{_wheel_log} }, $input;
   warn $input, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
@@ -247,6 +250,7 @@ sub _detect_loop {
   my $self = shift;
   my $input = shift || return;
   return if $self->{_loop_detect};
+  return if is_warning($input);
   my $digest = md5_hex( $input );
   $self->{_digests}->{ $digest }++;
   return unless ++$self->{_digests}->{ $digest } > 300;
@@ -272,6 +276,8 @@ sub _wheel_idle {
 
 sub _wheel_kill {
   my ($kernel,$self,$reason) = @_[KERNEL,OBJECT,ARG0];
+  return if $self->{_killed};
+  $self->{_killed} = 1;
   push @{ $self->{_wheel_log} }, $reason;
   warn $reason, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   if ( $^O eq 'MSWin32' and $self->{wheel} ) {
