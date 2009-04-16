@@ -3,13 +3,14 @@ abstract: 'POE enabled CPAN smoke testing with added value.'
 author:
   - 'Chris Williams <chris@bingosnet.co.uk>'
 build_requires:
+  ExtUtils::MakeMaker: 6.42
   File::Spec: 0
   Test::Harness: 3.14
   Test::More: 0.47
 configure_requires:
-  ExtUtils::MakeMaker: 6.50
+  ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 0.81'
+generated_by: 'Module::Install version 0.84'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,4 +32,5 @@ requires:
   perl: 5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.22
+  repository: git://github.com/bingos/poe-component-smokebox.git
+version: 0.24
