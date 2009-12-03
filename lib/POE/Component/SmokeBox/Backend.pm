@@ -11,7 +11,7 @@ use String::Perl::Warnings qw(is_warning);
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 use vars qw($VERSION);
 
-$VERSION = '0.28';
+$VERSION = '0.30';
 
 my $GOT_KILLFAM;
 my $GOT_PTY;
@@ -67,6 +67,7 @@ sub spawn {
   $opts{command} = lc $opts{command} || 'check';
   $opts{command} = 'check' unless grep { $_ eq $opts{command} } @cmds;
   $opts{perl} = $^X unless $opts{perl}; # and -e $opts{perl};
+  $opts{no_log} = 0 unless $opts{no_log};
   if ( $opts{command} eq 'smoke' and !$opts{module} ) {
      carp "You must specify a 'module' with 'smoke'\n";
      return;
@@ -173,7 +174,7 @@ sub _spawn_wheel {
     StdoutEvent => '_wheel_stdout',
     StderrEvent => '_wheel_stderr',
     ErrorEvent  => '_wheel_error',
-    CloseEvent  => '_wheel_close',
+    CloseEvent  => '_wheel_closed',
     ( $GOT_PTY ? ( Conduit => 'pty-pipe' ) : () ),
   );
   # Restore the %ENV values
@@ -190,9 +191,11 @@ sub _spawn_wheel {
 
 sub _sig_child {
   my ($kernel,$self,$thing,$pid,$status) = @_[KERNEL,OBJECT,ARG0..ARG2];
-  push @{ $self->{_wheel_log} }, "$thing $pid $status";
+  push @{ $self->{_wheel_log} }, "$thing $pid $status" if ! $self->{no_log};
   warn "$thing $pid $status\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
+  $kernel->sig_handled();
   $kernel->delay( '_wheel_idle' );
+
   $self->{end_time} = time();
   delete $self->{_digests};
   delete $self->{_loop_detect};
@@ -205,46 +208,49 @@ sub _sig_child {
   $job->{module} = $self->{module} if $self->{command} eq 'smoke';
   $kernel->post( $self->{session}, $self->{event}, $job );
   $kernel->refcount_decrement( $self->{session}, __PACKAGE__ );
-  $kernel->sig_handled();
+  return;
 }
 
 sub _wheel_error {
-  $poe_kernel->delay( '_wheel_idle' );
-  delete $_[OBJECT]->{wheel};
-  undef;
+  my ($self,$operation,$errnum,$errstr,$wheel_id) = @_[OBJECT,ARG0..ARG3];
+  $errstr = "remote end closed" if $operation eq "read" and !$errnum;
+  warn "wheel $wheel_id generated $operation error $errnum: $errstr\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
+  return;
 }
 
 sub _wheel_closed {
-  $poe_kernel->delay( '_wheel_idle' );
-  delete $_[OBJECT]->{wheel};
-  undef;
+  my ($kernel,$self) = @_[KERNEL,OBJECT];
+  $kernel->delay( '_wheel_idle' );
+  warn "wheel closed\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
+  delete $self->{wheel};
+  return;
 }
 
 sub _wheel_stdout {
   my ($self, $input, $wheel_id) = @_[OBJECT, ARG0, ARG1];
   return if $self->{_killed};
   $self->{_wheel_time} = time();
-  push @{ $self->{_wheel_log} }, $input;
+  push @{ $self->{_wheel_log} }, $input if ! $self->{no_log};
   warn $input, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   if ( $self->_detect_loop( $input, 'stdout' ) ) {
     $self->{excess_kill} = 1;
     $poe_kernel->yield( '_wheel_kill', 'Killing current run due to detection of looping output' );
   }
-  undef;
+  return;
 }
 
 sub _wheel_stderr {
   my ($self, $input, $wheel_id) = @_[OBJECT, ARG0, ARG1];
   return if $self->{_killed};
   $self->{_wheel_time} = time();
-  push @{ $self->{_wheel_log} }, $input;
+  push @{ $self->{_wheel_log} }, $input if ! $self->{no_log};
   warn $input, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   return if is_warning($input);
   if ( $self->_detect_loop( $input, 'stderr' ) ) {
     $self->{excess_kill} = 1;
     $poe_kernel->yield( '_wheel_kill', 'Killing current run due to detection of looping output' );
   }
-  undef;
+  return;
 }
 
 sub _detect_loop {
@@ -281,7 +287,7 @@ sub _wheel_kill {
   my ($kernel,$self,$reason) = @_[KERNEL,OBJECT,ARG0];
   return if $self->{_killed};
   $self->{_killed} = 1;
-  push @{ $self->{_wheel_log} }, $reason;
+  push @{ $self->{_wheel_log} }, $reason if ! $self->{no_log};
   warn $reason, "\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   if ( $^O eq 'MSWin32' and $self->{wheel} ) {
     $self->{wheel}->kill();
@@ -375,6 +381,7 @@ Creates a new POE::Component::SmokeBox::Backend component. Takes a number of par
   'timeout', change runtime timeout, specified in seconds, default is 3600;
   'module', the module to process, mandatory if 'smoke' command is specified;
   'env', a hashref of %ENV values to set when processing;
+  'no_log', enable to not store the job output log, default is false;
 
 You may also pass in arbitary parameters which will passed back to you in the C<event> specified. These
 arbitary parameters must be prefixed with an underscore.
