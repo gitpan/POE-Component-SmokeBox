@@ -11,7 +11,7 @@ use String::Perl::Warnings qw(is_warning);
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 use vars qw($VERSION);
 
-$VERSION = '0.32';
+$VERSION = '0.34';
 
 my $GOT_KILLFAM;
 my $GOT_PTY;
@@ -166,6 +166,8 @@ sub _spawn_wheel {
 			'^PERL5_SMOKEBOX',
 			'^HARNESS_',
 			'^(PERL5LIB|TAP_VERSION|TEST_VERBOSE)$',
+      '^AUTHOR_TESTING$',
+      '^PERL_TEST',
   ] );
   my $type = 'POE::Wheel::Run';
   $type .= '::Win32' if $^O eq 'MSWin32';
