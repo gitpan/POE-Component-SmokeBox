@@ -4,14 +4,13 @@ use strict;
 use warnings;
 use Carp;
 use Storable;
-use POE qw(Wheel::Run);
+use POE qw(Wheel::Run Filter::Line);
 use Digest::MD5 qw(md5_hex);
 use Env::Sanctify;
-use String::Perl::Warnings qw(is_warning);
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 use vars qw($VERSION);
 
-$VERSION = '0.36';
+$VERSION = '0.38';
 
 my $GOT_KILLFAM;
 my $GOT_PTY;
@@ -29,6 +28,21 @@ BEGIN {
         };
 	if ( $^O eq 'MSWin32' ) {
 		require POE::Wheel::Run::Win32;
+
+		# MSWin32: Disable critical error popups
+		# Thanks to https://rt.cpan.org/Public/Bug/Display.html?id=56547
+
+		# Call kernel32.SetErrorMode(SEM_FAILCRITICALERRORS):
+		# "The system does not display the critical-error-handler message box.
+		# Instead, the system sends the error to the calling process." and
+		# "A child process inherits the error mode of its parent process."
+		if ( eval { require Win32API::File } ) {
+			Win32API::File->import( qw( SetErrorMode SEM_FAILCRITICALERRORS SEM_NOGPFAULTERRORBOX ) );
+			SetErrorMode( SEM_FAILCRITICALERRORS() | SEM_NOGPFAULTERRORBOX() );
+		} else {
+			warn "Unable to use Win32API::File -> $@";
+			warn 'This means sometimes perl.exe will popup a dialog box... Annoying!';
+		}
 	}
 }
 
@@ -68,6 +82,12 @@ sub spawn {
   $opts{command} = 'check' unless grep { $_ eq $opts{command} } @cmds;
   $opts{perl} = $^X unless $opts{perl}; # and -e $opts{perl};
   $opts{no_log} = 0 unless $opts{no_log};
+  $opts{check_warnings} = 1 unless exists $opts{check_warnings};
+
+  if ( $opts{check_warnings} ) {
+     require String::Perl::Warnings;
+  }
+
   if ( $opts{command} eq 'smoke' and !$opts{module} ) {
      carp "You must specify a 'module' with 'smoke'\n";
      return;
@@ -145,6 +165,12 @@ sub _start {
   $kernel->refcount_increment( $sender_id, __PACKAGE__ );
   $self->{session} = $sender_id;
   $kernel->detach_myself() if $kernel != $sender;
+
+  $self->{_wheel_log} = [ ];
+  $self->{_digests} = { };
+  $self->{_loop_detect} = 0;
+  $self->{start_time} = time();
+
   $kernel->yield( '_spawn_wheel' );
   return;
 }
@@ -158,6 +184,19 @@ sub _shutdown {
 
 sub _spawn_wheel {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
+
+  # do we need to process callbacks?
+  if ( $self->{do_callback} ) {
+    # Ask it if we should process this job or not?
+    unless ( $self->{do_callback}->( 'BEFORE', $self ) ) {
+      warn "Callback denied job, aborting!\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
+      my $job = $self->_finalize_job( -1 );
+      $job->{cb_kill} = 1;
+      $kernel->post( $self->{session}, $self->{event}, $job );
+      return;
+    }
+  }
+
   # Set appropriate %ENV values before we fork()
   my $sanctify = Env::Sanctify->sanctify( 
 	env => $self->{env}, 
@@ -175,16 +214,15 @@ sub _spawn_wheel {
     Program     => $self->{program},
     StdoutEvent => '_wheel_stdout',
     StderrEvent => '_wheel_stderr',
+    StdoutFilter => POE::Filter::Line->new( InputLiteral => "\n" ),
+    StderrFilter => POE::Filter::Line->new( InputLiteral => "\n" ),
     ErrorEvent  => '_wheel_error',
     CloseEvent  => '_wheel_closed',
     ( $GOT_PTY ? ( Conduit => 'pty-pipe' ) : () ),
   );
   # Restore the %ENV values
   $sanctify->restore();
-  $self->{_wheel_log} = [ ];
-  $self->{_digests} = { };
-  $self->{_loop_detect} = 0;
-  $self->{start_time} = $self->{_wheel_time} = time();
+  $self->{_wheel_time} = time();
   $self->{PID} = $self->{wheel}->PID();
   $kernel->sig_child( $self->{PID}, '_sig_child' );
   $kernel->delay( '_wheel_idle', $self->{timer} ) unless $self->{command} eq 'index';
@@ -198,9 +236,25 @@ sub _sig_child {
   $kernel->sig_handled();
   $kernel->delay( '_wheel_idle' );
 
+  my $job = $self->_finalize_job( $status );
+
+  # do we need to process callbacks?
+  if ( $self->{do_callback} ) {
+    # Inform the callback that the job is done
+    $self->{do_callback}->( 'AFTER', $self, $job );
+  }
+
+  $kernel->post( $self->{session}, $self->{event}, $job );
+  return;
+}
+
+sub _finalize_job {
+  my( $self, $status ) = @_;
+
   $self->{end_time} = time();
   delete $self->{_digests};
   delete $self->{_loop_detect};
+
   my $job = { };
   $job->{status} = $status;
   $job->{log} = $self->{_wheel_log};
@@ -208,9 +262,9 @@ sub _sig_child {
   $job->{$_} = $self->{$_} for grep { $self->{$_} } qw(command env PID start_time end_time idle_kill excess_kill term_kill perl type);
   $job->{program} = $self->{program} if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   $job->{module} = $self->{module} if $self->{command} eq 'smoke';
-  $kernel->post( $self->{session}, $self->{event}, $job );
-  $kernel->refcount_decrement( $self->{session}, __PACKAGE__ );
-  return;
+  $poe_kernel->refcount_decrement( $self->{session}, __PACKAGE__ );
+
+  return $job;
 }
 
 sub _wheel_error {
@@ -261,7 +315,14 @@ sub _detect_loop {
   return if $self->{_loop_detect};
   return if $input =~ /^\[(MSG|ERROR)\]/;
   my $digest = md5_hex( $input );
-  my $weighting = ( $handle eq 'stderr' and is_warning($input) ) ? 1 : 10;
+
+  my $weighting;
+  if ( $self->{check_warnings} ) {
+    $weighting = ( $handle eq 'stderr' and String::Perl::Warnings::is_warning($input) ) ? 1 : 10;
+  } else {
+    $weighting = $handle eq 'stderr' ? 1 : 10;
+  }
+
   $self->{_digests}->{ $digest } += $weighting;
   return unless ++$self->{_digests}->{ $digest } > 3000;
   return $self->{_loop_detect} = 1;
@@ -443,6 +504,7 @@ ARG0 of the C<event> specified in one of the constructors will be a hashref with
   'idle_kill', only present if the job was killed because of excessive idle;
   'excess_kill', only present if the job was killed due to excessive runtime;
   'term_kill', only present if the job was killed due to a poco shutdown event;
+  'cb_kill', only present if the job was killed due to the callback returning false;
 
 Plus any of the parameters given to one of the constructors, including arbitary ones.
 
