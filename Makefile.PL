@@ -17,6 +17,7 @@ requires 'Object::Accessor' => 0;
 requires 'Digest::MD5' => 0;
 requires 'Env::Sanctify' => 0.04;
 requires 'String::Perl::Warnings' => 0.04;
+makemaker_args(dist => { PREOP => "$^X ./tools/git-log.pl > ./Changes" });
 githubmeta;
 unless ( win32 ) {
   if ( ! can_use 'IO::Pty' ) {
@@ -34,25 +35,4 @@ else {
 }
 
 tests 't/*.t t/*/*.t';
-
-print <<NOTICE;
-
-\a--------------------------------------------------------------
-Hi,
-
-This is an early release of POE::Component::SmokeBox.
-
-Thanks for your interest.
-
-There may still be stuff wrong with it, but it should be
-usable. Enjoy.
-
-Any bug reports, feature requests, send an email to 
-<bug-POE-Component-SmokeBox\@rt.cpan.org>
-
---------------------------------------------------------------
-
-NOTICE
-
-sleep(5);
 WriteAll();

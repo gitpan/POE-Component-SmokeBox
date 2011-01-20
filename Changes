@@ -1,107 +1,247 @@
-POE::Component::SmokeBox ChangeLog
-==================================
+==============================
+2011-01-20 12:18:31 +0000 0.40
+==============================
 
-0.38  Fri Apr 16 20:56:40 BST 2010
-  - Explicitly use the \n InputLiteral in Backend's PWR
+  commit 08d2121e51b378f6d9f90d69a1ef7f8f278e85a2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Jan 20 12:18:31 2011 +0000
+  
+    Remove the warning message from Makefile.PL
 
-0.36  Mon Mar 22 22:54:58 GMT 2010
-  - Change the logic slightly for detecting loops in output
-    ( suggested by apocal ).
+  commit 3c7a479756becfa716b73f56cae59b81b3fbbf3d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Jan 20 12:16:48 2011 +0000
+  
+    Bump version to 0.40
 
-0.34  Thu Dec 24 09:42:51 GMT 2009
-  - Scrub extra env vars from the spawned smoke processes
-    http://xrl.us/bgq4n8
+  commit 472a425c75859708b7f5b76cc7fffa8ee4104370
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Jan 20 10:21:30 2011 +0000
+  
+    Remove Changes file and config for it to be automatically generated
 
-0.32  Sat Dec 19 20:52:50 GMT 2009
-  - added delay param to smokebox->new() and job->new() to 
-    enable throttling (apocal)
+  commit 21fb5c3ea463ed8c37838fc28630c694959a8c20
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Thu Jan 20 09:51:28 2011 +0800
+  
+    Add pause_queue_now() to pause between smokers and more testcases for
+    the pause logic 
 
-0.30  Thu Dec  3 10:12:06 GMT 2009
-  - Added no_log parameter to ::Job / ::Backend to conserve memory (apocal)
-  - Fixed wheel close bug, thanks to devin@#poe! (apocal)
+==============================
+2010-04-27 21:54:00 +0100 0.38
+==============================
 
-0.28  Mon Jul 13 10:03:20 BST 2009
-  - Add weightings to STDOUT and STDERR in the looping output detection.
+  commit 1441441f79e94a54c970ad6e8030d4b2c8b45829
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Tue Apr 27 21:54:00 2010 +0100
+  
+    Bump version to 0.38
 
-0.26	Fri May 15 23:48:35 BST 2009
-	- Updated Makefile.PL
-	- Added SmokeInAbox Backend
+  commit 6173f8e97ac9f915a1d4c525bb1f208073d276de
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Tue Apr 27 10:07:04 2010 -0700
+  
+    add name to SmokeBox::Smoker for easier identification of smokers
 
-0.24	Thu Apr 16 15:40:52 BST 2009
-	- Reversioned all the modules to 0.24
-	- Updated Backend::CPAN::Reporter to add CPAN::Index->reload; $CPAN::META->reset_tested;
-	  Suggested by Dave Golden
-	- Set repository in META.yml
+  commit bfac61471cd2b7d465dafe0b0b2629dff1d8df76
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Tue Apr 20 11:41:04 2010 -0700
+  
+    add Win32API::File code to disable popups during smoking
 
-0.22	Wed Apr  1 23:09:12 BST 2009
-	- Tweak the loop detection yet again. skip over
-	  CPANPLUS messages this time.
+  commit 7f951cb853fe162cd8807b7d2a377d608cb261f1
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Mon Apr 19 02:34:54 2010 -0700
+  
+    add check_warnings option to SmokeBox::Job->new to control usage of
+    String::Perl::Warnings
 
-0.20	Mon Mar 16 07:08:09 GMT 2009
-	- Move where we detect perl warnings to the stderr handler
+  commit c1ee77ecf00f8712d8f629930307c96385e2e4fe
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Fri Apr 16 20:57:40 2010 +0100
+  
+    Explicitly use the \n InputLiteral in Backend's PWR
 
-0.18	Thu Mar 12 21:38:11 GMT 2009
-	- Made the kill code slightly more robust.
-	- Use String::Perl::Warnings to skip over perl
-	  warnings in the loop detection code.
+  commit d7e967927b0682c54a400685789130dd71c6760e
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Sat Apr 10 21:48:05 2010 -0700
+  
+    d0h, POE::Session->callback returns POE::Session::AnonEvent, not a
+    pure CODE ref
 
-0.16	Tue Feb 10 12:41:00 GMT 2009
-	- Found a bug in Env::Sanctify, which is fixed.
-	- Sanctify %ENV really well before forking.
-	- Detect AUTOMATED_TESTING in kill tests and use 
-	  no_grp_kill => 1 
+  commit fa00ab4d4c9a78e9da9cb158648794bff402d2da
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Sat Apr 10 18:44:14 2010 -0700
+  
+    reverse the wrong logic in IO::Pty detection
 
-0.14	Thu Feb  5 22:36:53 GMT 2009
-	- [rt #43027] Applied patch from oxdeadbeef
-	- Fixed refcount management in JobQueue
-	- Overhauled the testsuite.
+  commit 1fa1dd67a3dc06a4a103c01042495ffd30d0a7be
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Thu Apr 8 22:19:46 2010 +0100
+  
+    Makefile.PL jiggery for MSWin32
 
-0.12	Wed Feb  4 10:56:50 GMT 2009
-	- Stop POE debug ENV vars propagating to the forked process.
+  commit 96357ee17162902515dbede7fbe2335d131901a0
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Wed Apr 7 22:37:02 2010 -0700
+  
+    Added callback mode to the SmokeBox::Smoker object for extensibility 
 
-0.10	Tue Feb  3 22:11:02 GMT 2009
-	- added CPAN::Reporter::Smoker backend
-	- skip test_loop test on Solaris
+==============================
+2010-03-22 22:57:56 +0000 0.36
+==============================
 
-0.08	Sat Jan 31 22:16:57 GMT 2009
-	- Fixed Win32 support, thanks to Dave Golden for
-	  pointing that out.
+  commit 749ab5f3b9ce0adf34be784c075724b304b87891
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Mon Mar 22 22:57:56 2010 +0000
+  
+    This be 0.36
 
-0.06	Fri Dec 19 09:20:42 GMT 2008
-	- Added 'pty-pipe' conduit and IO::Pty as a strongly 
-	  recommended prereq.
+  commit 863866e177f85277f77498d5383716643ec4199f
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Mon Mar 22 22:30:11 2010 +0000
+  
+    Change the logic slightly for detecting loops in output 
 
-0.04	Fri Dec  5 12:33:50 GMT 2008
-	- 'kill' hackery in Backend for solaris
+==============================
+2009-12-24 09:46:08 +0000 0.34
+==============================
 
-0.01_10	Wed Oct 22 21:49:08 BST 2008
-	- Amended the tests that were wacking out on Dragonflybsd 
-	  and certain fbsd boxen.
+  commit ff5b0ebb6c033c000e2da50c9de5456de23faca6
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Thu Dec 24 09:46:08 2009 +0000
+  
+    Bump to version 0.34
 
-0.01_09	Mon Oct 20 15:53:20 BST 2008
-	- Amended some of the longer running tests.
+  commit ffa4930fde806d3d4a869345d4c0bceb97c27eda
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Thu Dec 24 09:30:42 2009 +0000
+  
+    Added AUTHOR_TESTING and PERL_TEST* environment variable scrubbing to
+    Backend
 
-0.01_07	Fri Oct 10 22:46:40 BST 2008
-	- Trying to see if it is a problem with older T::H for
-	  hangs on certain CPAN tester configurations.
+  commit 271756a7d286106f2bf380bb292f89628706fe7b
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Sat Dec 19 14:06:40 2009 -0700
+  
+    minor fix to delay logic to guarantee a delay 
 
-0.01_06	Wed Oct  8 16:24:59 BST 2008
-	- Fixed a problem with the 00_dump_stuff.t test.
+==============================
+2009-12-19 20:54:04 +0000 0.32
+==============================
 
-0.01_05 Wed Oct  8 10:37:11 BST 2008
-	- Changed the API for ::Job and ::JobQueue. We don't
-	  define smokers in the Job object now, this was doomed
-	  to fatal failure.
+  commit 31b6acb9fa19fa463a0e441686317d55281bb1f2
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Sat Dec 19 20:54:04 2009 +0000
+  
+    This be 0.32
 
-0.01_04	Tue Oct  7 17:20:13 BST 2008
-	- Added loop detection to ::Backend 
+  commit d67735f68a01d764218c4e028514538f16a5337e
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Fri Dec 18 15:46:59 2009 -0700
+  
+    added delay param to smokebox->new() and job->new() to enable
+    throttling 
 
-0.01_03	Fri Oct  3 13:25:26 BST 2008
-	- Fixed bug in JobQueue, we were only processing
-	  the first job that was submitted. Doh.
+==============================
+2009-12-03 10:13:07 +0000 0.30
+==============================
 
-0.01_02	Fri Oct  3 12:10:18 BST 2008
-	- Added PERL5_SMOKEBOX_DEBUG env to ::Backend
+  commit 5cc82da4d7659f3c3e57b9c4e2a3c6a99ba32ccb
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Thu Dec 3 10:13:07 2009 +0000
+  
+    Prepared for CPAN Release
 
-0.01_01	Mon Sep  8 12:47:26 BST 2008
-	- Initial public developer release
+  commit f99279f3db5917737d1ba29bb94b9d322ead971b
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Thu Dec 3 17:43:09 2009 +0800
+  
+    tweak tests so we're sure of log contents
+
+  commit 683b4bdf8358ff1b72edafa2e695cda470ac2af4
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Thu Dec 3 17:02:07 2009 +0800
+  
+    fixed wheel close bug, thanks to devin@#poe!
+
+  commit 2676ef52b4616a9e713ab6d17ed06069400c8588
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Thu Dec 3 12:10:54 2009 +0800
+  
+    added no_log parameter to ::Job / ::Backend to conserve memory 
+
+==============================
+2009-07-13 10:04:12 +0100 0.28
+==============================
+
+  commit 4fcc51a98615aa43d33c80e6daa12df7c670e1b5
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Mon Jul 13 10:04:12 2009 +0100
+  
+    Prepeared for CPAN release
+
+  commit 99fb211f6956e6fd4ba05e77fedd31a93e163f07
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Mon Jul 13 10:02:38 2009 +0100
+  
+    Add weightings to STDOUT or STDERR in the looping output detection. 
+
+==============================
+2009-05-15 23:49:54 +0100 0.26
+==============================
+
+  commit d14bb404a098a5190ffdbd144992d4ec13d435bc
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Fri May 15 23:49:54 2009 +0100
+  
+    Bump version
+
+  commit c7988961636b0fc3aa7c21e051a6b934016a694c
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Fri May 15 23:45:45 2009 +0100
+  
+    Added new Backend for SmokeInABox 
+
+==============================
+2009-04-16 15:41:14 +0100 0.24
+==============================
+
+  commit 8d9bcf3c6bde3e474379605e9c82536f345eb902
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Thu Apr 16 15:41:14 2009 +0100
+  
+    Reversioned all the modules to 0.24. Updated Backend::CPAN::Reporter
+    to add CPAN::Index->reload; $CPAN::META->reset_tested; Suggested by
+    Dave Golden. Set repository in META.yml 
+
+==============================
+2009-04-01 23:10:31 +0100 0.22
+==============================
+
+  commit 08657451b23b7f4997b84af85e87174b257d0fe2
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Wed Apr 1 23:10:31 2009 +0100
+  
+    Minor changes to the loop detection code. skip over CPANPLUS
+    errorstack messages. 
+
+==============================
+2009-03-16 07:08:36 +0000 0.20
+==============================
+
+  commit 966fe4269565430294802570d7db9854822d0b73
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Mon Mar 16 07:08:36 2009 +0000
+  
+    Bump version for release
+
+  commit 0addebc414cabf6c0a835f522e53eaf187d34d15
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Sun Mar 15 21:19:34 2009 +0000
+  
+    Move where we detect perl warnings to the stderr handler 
+
+==============
+End of Excerpt
+==============
