@@ -1,4 +1,27 @@
 ==============================
+2011-02-06 23:00:55 +0000 0.42
+==============================
+
+  commit 9d8eae91fd34f31c4b06eb9ef343f3aec7811bb6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Feb 6 23:00:55 2011 +0000
+  
+    Add .gitignore
+
+  commit ff4d5c448520094ac351cf876952cdd996596ffc
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Feb 6 22:53:50 2011 +0000
+  
+    Bump to version 0.42
+
+  commit 8de3fe614d431cbe8752347ec762485699a342ab
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Feb 6 22:45:30 2011 +0000
+  
+    Change to Digest::SHA instead of Digest::MD5 for our looping output
+    tracking 
+
+==============================
 2011-01-20 12:18:31 +0000 0.40
 ==============================
 

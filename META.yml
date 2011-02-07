@@ -22,7 +22,7 @@ no_index:
     - inc
     - t
 requires:
-  Digest::MD5: 0
+  Digest::SHA: 0
   Env::Sanctify: 0.04
   Module::Pluggable: 0
   Object::Accessor: 0
@@ -34,4 +34,4 @@ resources:
   homepage: http://github.com/bingos/poe-component-smokebox/tree
   license: http://dev.perl.org/licenses/
   repository: git://github.com/bingos/poe-component-smokebox.git
-version: 0.40
+version: 0.42
