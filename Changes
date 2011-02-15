@@ -1,3 +1,20 @@
+=================================
+2011-02-15 12:45:26 +0000 0.43_01
+=================================
+
+  commit 38edc7a62be6ef1ae1b7c10f9210a1879832bcb5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Feb 15 12:45:26 2011 +0000
+  
+    Bump to dev release 0.43_01
+
+  commit 56a0afb0fb95e45b5271b3a3a2f9f44fbab6bd4e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Feb 15 12:43:36 2011 +0000
+  
+    Store the SHA256 digests in a SDBM_File backed hash to reduce memory
+    footprint 
+
 ==============================
 2011-02-06 23:00:55 +0000 0.42
 ==============================
