@@ -1,3 +1,19 @@
+==============================
+2011-02-15 21:49:54 +0000 0.44
+==============================
+
+  commit 83287bf3428d6d48732d044959b0778201ce528e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Feb 15 21:49:54 2011 +0000
+  
+    Bump version to 0.44
+
+  commit b2ead74e698c57990e3fa2288c65b8c80d86c13b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Feb 15 21:48:48 2011 +0000
+  
+    Tidied up the digests tie code 
+
 =================================
 2011-02-15 12:45:26 +0000 0.43_01
 =================================
