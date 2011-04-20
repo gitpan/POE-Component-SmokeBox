@@ -1,4 +1,21 @@
 ==============================
+2011-04-20 10:06:00 +0100 0.46
+==============================
+
+  commit f6ac2eb489c151b29e40ff2ed42c7133d3112724
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed Apr 20 10:06:00 2011 +0100
+  
+    Bump version to 0.46
+
+  commit a54f17b139ec187d5236b49c1a746bb82b0b7bbf
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed Apr 20 09:59:10 2011 +0100
+  
+    Use hex digests instead of binary ones, suppress debug lines > 5000
+    and only check for perl warnings if the line < 5000 
+
+==============================
 2011-02-15 21:49:54 +0000 0.44
 ==============================
 
