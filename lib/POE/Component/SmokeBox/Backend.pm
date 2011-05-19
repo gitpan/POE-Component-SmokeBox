@@ -15,7 +15,7 @@ use Env::Sanctify;
 use Module::Pluggable search_path => 'POE::Component::SmokeBox::Backend', sub_name => 'backends', except => 'POE::Component::SmokeBox::Backend::Base';
 use vars qw($VERSION);
 
-$VERSION = '0.46';
+$VERSION = '0.48';
 
 my $GOT_KILLFAM;
 my $GOT_PTY;
@@ -82,6 +82,7 @@ sub spawn {
   $opts{idle} = 600 unless $opts{idle};
   $opts{timeout} = 3600 unless $opts{timeout};
   $opts{timer} = 60 unless $opts{timer};
+  $opts{reaper} = 30 unless $opts{reaper};
   $opts{type} = 'CPANPLUS::YACSmoke' unless $opts{type};
   $opts{command} = lc $opts{command} || 'check';
   $opts{command} = 'check' unless grep { $_ eq $opts{command} } @cmds;
@@ -125,7 +126,7 @@ sub spawn {
   $self->{session_id} = POE::Session->create(
      package_states => [
 	$self => { shutdown => '_shutdown', },
-	$self => [qw(_start _spawn_wheel _wheel_error _wheel_closed _wheel_stdout _wheel_stderr _wheel_idle _wheel_kill _sig_child)],
+	$self => [qw(_start _spawn_wheel _wheel_error _wheel_closed _wheel_stdout _wheel_stderr _wheel_idle _wheel_reap _wheel_kill _sig_child)],
      ],
      heap => $self,
      ( ref($options) eq 'HASH' ? ( options => $options ) : () ),
@@ -229,8 +230,8 @@ sub _spawn_wheel {
   }
 
   # Set appropriate %ENV values before we fork()
-  my $sanctify = Env::Sanctify->sanctify( 
-	env => $self->{env}, 
+  my $sanctify = Env::Sanctify->sanctify(
+	env => $self->{env},
 	sanctify => [
 			'^POE_',
 			'^PERL5_SMOKEBOX',
@@ -276,6 +277,7 @@ sub _sig_child {
   }
 
   $kernel->post( $self->{session}, $self->{event}, $job );
+  $kernel->delay( '_wheel_reap' => $self->{reaper} ) if $self->{wheel};
   return;
 }
 
@@ -300,6 +302,13 @@ sub _finalize_job {
   return $job;
 }
 
+sub _wheel_reap {
+  my ($kernel,$self) = @_[KERNEL,OBJECT];
+  warn "wheel reaped\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
+  delete $self->{wheel};
+  return;
+}
+
 sub _wheel_error {
   my ($self,$operation,$errnum,$errstr,$wheel_id) = @_[OBJECT,ARG0..ARG3];
   $errstr = "remote end closed" if $operation eq "read" and !$errnum;
@@ -310,6 +319,7 @@ sub _wheel_error {
 sub _wheel_closed {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
   $kernel->delay( '_wheel_idle' );
+  $kernel->delay( '_wheel_reap' );
   warn "wheel closed\n" if $self->{debug} or $ENV{PERL5_SMOKEBOX_DEBUG};
   delete $self->{wheel};
   return;
@@ -466,9 +476,9 @@ POE::Component::SmokeBox::Backend - smoker backend to POE::Component::SmokeBox
 POE::Component::SmokeBox::Backend is the smoker backend to L<POE::Component::SmokeBox::JobQueue> and
 ultimately L<POE::Component::SmokeBox>.
 
-It takes a processes a single CPAN distribution against a given C<perl> executable using a 
+It takes a processes a single CPAN distribution against a given C<perl> executable using a
 configurable backend type ( currently, L<CPAN::YACSmoke>, L<CPANPLUS::YACSmoke> or L<CPAN::Reporter> ),
-monitors the process for idle ( ie. no output ) or excess runtime, and returns the results to the 
+monitors the process for idle ( ie. no output ) or excess runtime, and returns the results to the
 requesting L<POE::Session>.
 
 =head1 CONSTRUCTOR
@@ -555,7 +565,7 @@ Plus any of the parameters given to one of the constructors, including arbitary 
 
 =head1 ENVIRONMENT
 
-Setting the environment variable C<PERL5_SMOKEBOX_DEBUG> will cause the component to spew out lots of 
+Setting the environment variable C<PERL5_SMOKEBOX_DEBUG> will cause the component to spew out lots of
 information on STDERR.
 
 =head1 AUTHOR

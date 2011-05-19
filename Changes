@@ -1,4 +1,21 @@
 ==============================
+2011-05-19 10:15:58 +0100 0.48
+==============================
+
+  commit 45ce9b17626a920a6e849f927424fa06edccbc88
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu May 19 10:15:58 2011 +0100
+  
+    Bump version and correct trailing whitespace.
+
+  commit c1d8d64c26521111644def1eab74d1c1447b9558
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu May 19 10:12:20 2011 +0100
+  
+    Add a wheel reaper process to clean up the wheel if it is left open
+    for some reason. 
+
+==============================
 2011-04-20 10:06:00 +0100 0.46
 ==============================
 
